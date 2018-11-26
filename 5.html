@@ -2,7 +2,7 @@
 <html>
   <head>
       <meta charset="utf-8" />
-      <title>index</title>
+      <title>5</title>
 <script type="text/x-mathjax-config">
   MathJax.Hub.Config({
     jax: ["input/TeX","output/HTML-CSS"],
@@ -598,14 +598,108 @@ pre.editor-colors .fold-marker:after {
 pre.editor-colors { overflow: auto; }</style>
   </head>
   <body class="markdown-preview-plus-view">
-    <h1>Computational Geometry</h1>
-<p>These are the notes for the Computational Geometry course for 2018-2019. They are
-based on the notes of the lectures and from the reference book.</p>
-<h1>Courses</h1>
+    <h1>Computational Geometry: Course 5</h1>
+<h1>Lower Bounds</h1>
+<p>Last time we have proven that Convex Hull cannot be solved faster than <span class="math"><script type="math/tex">O(n\log n)</script></span>.</p>
+<p>Sorting takes <span class="math"><script type="math/tex">\Omega(n\log n)</script></span>. Nevertheless, changing the model (without comparisons) the problem can be solved on linear time (see <a href="https://en.wikipedia.org/wiki/Bucket_sort">Bucket sort</a>).</p>
+<h2>How to beat Lower Bounds</h2>
+<ol>
+<li>
+<p>Change model</p>
+</li>
+<li>
+<p>Change problem (approximation algorithms)</p>
+</li>
+<li>
+<p>Change how you measure running time</p>
 <ul>
-<li><a href="./1.html">Lecture 1: 5/11/2018</a></li>
-<li><a href="./5.html">Lecture 5: 22/11/2018</a></li>
-<li><a href="./6.html">Lecture 6: 26/11/2018</a></li>
+<li>Jarvis march works on <span class="math"><script type="math/tex">O(nH)</script></span> where <span class="math"><script type="math/tex">H</script></span> is the number of points on CH.</li>
+<li>Graham scan works on <span class="math"><script type="math/tex">O(n\log n)</script></span>. We can say that if <span class="math"><script type="math/tex">H=\log n</script></span> Graham Scan becomes better (???).</li>
+</ul>
+<p>You can see that Jarvis March’s complexity is output sensitive (it depends on the size of the CH).</p>
+</li>
+</ol>
+<h3>Comparing running time</h3>
+<p>The brute force approach: We can run both of the algorithms in the same time and kill the process who finishes last -&gt; take the first one.</p>
+<p><a href="https://en.wikipedia.org/wiki/Timothy_M._Chan">T. Chan</a> got an idea to get an optimal algorithm in <span class="math"><script type="math/tex">O(n\log H)</script></span>:</p>
+<ul>
+<li>Imagine you know what <span class="math"><script type="math/tex">H</script></span> is.</li>
+<li>Graham Scan takes <span class="math"><script type="math/tex">H\log H</script></span>, we compute that on an arbitrary group of <span class="math"><script type="math/tex">H</script></span> points.</li>
+<li>We do this <span class="math"><script type="math/tex">\frac{n}{H}</script></span> times so we will have <span class="math"><script type="math/tex">\frac{n}{H}</script></span> Convex Hulls.</li>
+<li>We have now <span class="math"><script type="math/tex">O(H\log H)</script></span> for each group, we do this <span class="math"><script type="math/tex">n</script></span> times so the new complexity is <span class="math"><script type="math/tex">O(\frac{n}{H}H\log H)=O(n\log H)</script></span>.</li>
+<li>We do now Jarvis March on this, taking each time the tangent of the chosen point with every convex hull -&gt; <span class="math"><script type="math/tex">H(\frac{n}{H}\log H)=O(n\log H)</script></span>.</li>
+</ul>
+<p>BONUS: <a href="https://en.wikipedia.org/wiki/Exponential_search">Exponential search</a>.</p>
+<p>With exponential search, we take time: (take prats notes mdr)</p>
+<h2>Beating Lower Bounds</h2>
+<p>Recall: Finding point in complex polygon (not convex) is <span class="math"><script type="math/tex">\Omega(n)</script></span>. Draw a line from outside and count if even or odd the intersections with polygon (inside or outside).</p>
+<p>Now we want to analyse this problem in the case we want to find if <span class="math"><script type="math/tex">n</script></span> points are inside the polygon by batching.</p>
+<p>This algorithm is called <em>Plane Sweep</em>:</p>
+<p><strong>PLANE SWEEP</strong>: (in the case of orthogonal polygons)</p>
+<ul>
+<li><em>Input</em>: A polygon of size <span class="math"><script type="math/tex">n</script></span> + <span class="math"><script type="math/tex">n</script></span> points.</li>
+<li><em>Output</em>: for each point determine if it is inside or out.</li>
+</ul>
+<p><img src="https://www.researchgate.net/profile/Konstantinos_Kakoulis/publication/299499230/figure/fig7/AS:350354463051776@1460542421011/The-step-of-the-plane-sweep-algorithm-that-resolves-overlaps-for-Label-2.png" alt="Plane weep"></p>
+<p>We “sweep” the plane with a line and each time we find a new event (point or line) we scan. We must take into consideration:</p>
+<ol>
+<li>Events queue</li>
+<li>Sweepline data structure</li>
+</ol>
+<p>The algorithm then is simple:</p>
+<pre class="editor-colors lang-text"><span class="syntax--text syntax--plain"><span class="syntax--meta syntax--paragraph syntax--text"><span>create events queue</span></span></span>
+<span class="syntax--text syntax--plain"><span class="syntax--meta syntax--paragraph syntax--text"><span>while there is an event</span></span></span>
+<span class="syntax--text syntax--plain"><span>    </span><span class="syntax--meta syntax--paragraph syntax--text"><span>process the event</span></span></span>
+<span class="syntax--text syntax--plain"><span class="syntax--meta syntax--paragraph syntax--text"><span>    update the sweepline DS</span></span></span>
+</pre>
+<p><strong>EVENTS</strong>:</p>
+<ul>
+<li>Polygon vertices (array with vertices in order)
+<ul>
+<li>If left endpoint: Then add it to the sweepline DS</li>
+<li>If right endpoint: Then delete it from the sweepline DS</li>
+</ul>
+</li>
+<li>Query point
+<ul>
+<li>Find segment just below point.</li>
+</ul>
+</li>
+</ul>
+<p>So the data structure of the sweepline will be a <em>Binary Search Tree</em> <span class="math"><script type="math/tex">\to</script></span> <em>Red-Black Tree</em> (because they balance themselves <span class="math"><script type="math/tex">\to O(log n)</script></span> operations).</p>
+<p>In the case we don’t have orthogonal polygons we have to store diagonal segments: <em>Triangulation</em></p>
+<h2>Triangulation of simple polygons</h2>
+<p>How do we do it? Or better: <em>Can we do it?</em></p>
+<p>The answer: of course! How then?</p>
+<p><strong>Proof by induction</strong>:
+We can take off a vertex, and suppose that the new polygon can be triangulated.</p>
+<p><img src="http://cgm.cs.mcgill.ca/~godfried/teaching/cg-projects/97/Ian/triangulation.gif" alt="ear"></p>
+<p>Each point that is taken off is an ear. We have just to take off the point and add it again to create this triangulation iteratively.</p>
+<p>This is a constructive proof: the proof is actually the algorithm.</p>
+<p><strong>THEOREM:</strong> Every polygon of more than 4 vertices has at least two disjoint ears.</p>
+<p><strong>PROOF:</strong>
+By induction:</p>
+<ul>
+<li>Base case: <span class="math"><script type="math/tex">n=4</script></span>
+<ul>
+<li>Convex or concave: it has 2 ears</li>
+</ul>
+</li>
+<li>Assume every polygon with <span class="math"><script type="math/tex">< n</script></span> vertices has more than 2 non overlapping ears.
+<ul>
+<li>Take a convex vertex of the polygon
+<ul>
+<li>If it is an ear: cut it off, there is another ear by induction.</li>
+<li>If it is not an ear, we do same as the concave square and cut it. Then apply induction to both of them if they have <span class="math"><script type="math/tex">\geq 4</script></span>.
+<ul>
+<li>If we have less than 3 vertices -&gt; those vertices are an ear.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Remark: disjoint convex vertex = turns left.</li>
+</ul>
+</li>
 </ul>
   </body>
 </html>

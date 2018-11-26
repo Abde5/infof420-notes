@@ -2,7 +2,7 @@
 <html>
   <head>
       <meta charset="utf-8" />
-      <title>index</title>
+      <title>6</title>
 <script type="text/x-mathjax-config">
   MathJax.Hub.Config({
     jax: ["input/TeX","output/HTML-CSS"],
@@ -598,14 +598,63 @@ pre.editor-colors .fold-marker:after {
 pre.editor-colors { overflow: auto; }</style>
   </head>
   <body class="markdown-preview-plus-view">
-    <h1>Computational Geometry</h1>
-<p>These are the notes for the Computational Geometry course for 2018-2019. They are
-based on the notes of the lectures and from the reference book.</p>
-<h1>Courses</h1>
+    <h1>Computational Geometry: Course 6</h1>
+<h1>Triangulation</h1>
+<p>Last day we saw the 2 ears theorem. (We have at least 2 ears on a polygon with <span class="math"><script type="math/tex">\geq 4</script></span> vertices).</p>
+<h2>Algorithm</h2>
 <ul>
-<li><a href="./1.html">Lecture 1: 5/11/2018</a></li>
-<li><a href="./5.html">Lecture 5: 22/11/2018</a></li>
-<li><a href="./6.html">Lecture 6: 26/11/2018</a></li>
+<li><strong>First</strong>: Check if a convex vertex is an ear. <span class="math"><script type="math/tex">O(n)</script></span></li>
+<li><strong>Second</strong>: Find an ear P <span class="math"><script type="math/tex">O(n^2)</script></span></li>
 </ul>
+<pre class="editor-colors lang-text"><span class="syntax--text syntax--plain"><span class="syntax--meta syntax--paragraph syntax--text"><span>for i = 1 to n</span></span></span>
+<span class="syntax--text syntax--plain"><span>    </span><span class="syntax--meta syntax--paragraph syntax--text"><span>if vertex i is LT (LEFT ORIENT):</span></span></span>
+<span class="syntax--text syntax--plain"><span class="syntax--meta syntax--paragraph syntax--text"><span>    check if i is an ear</span></span></span>
+</pre>
+<ul>
+<li><strong>Third</strong>: Triangulate <span class="math"><script type="math/tex">O(n^3)</script></span></li>
+</ul>
+<pre class="editor-colors lang-text"><span class="syntax--text syntax--plain"><span class="syntax--meta syntax--paragraph syntax--text"><span>Repeat n-2 times</span></span></span>
+<span class="syntax--text syntax--plain"><span>    </span><span class="syntax--meta syntax--paragraph syntax--text"><span>Find an ear</span></span></span>
+<span class="syntax--text syntax--plain"><span class="syntax--meta syntax--paragraph syntax--text"><span>    Cut it</span></span></span>
+</pre>
+<h3>Speedup</h3>
+<p>We now have a slow algorithm that works, now we should find a way to speed it up.</p>
+<p><strong>Definition</strong>: A chord is a line that goes from a convex vertex to a point that is found on the ear that it forms.</p>
+<p>To find a chord we take <span class="math"><script type="math/tex">O(n)</script></span>.</p>
+<p>New algorithm:</p>
+<ul>
+<li><strong>First</strong>: Find a chord in <span class="math"><script type="math/tex">O(n)</script></span></li>
+<li><strong>Second</strong>: Recurse on the smaller side. The recurrent time then is:</li>
+</ul>
+<span class="math"><script type="math/tex; mode=display">T(n) \leq cn + T(\frac{n}{2}) \ \ \ \text{because smaller side}
+</script></span>
+<span class="math"><script type="math/tex; mode=display">T(n) \leq cn + c\frac{n}{2} + T(\frac{n}{4})
+</script></span>
+<span class="math"><script type="math/tex; mode=display">T(n) \leq cn + c\frac{n}{2} + c\frac{n}{4} + T(\frac{n}{8})
+</script></span>
+<span class="math"><script type="math/tex; mode=display">T(n) \leq cn(1 + \frac{1}{2} + \frac{1}{4} \dots) = 2cn
+</script></span>
+<ul>
+<li><strong>Third</strong> Find an ear in polygon with one forbidden edge <span class="math"><script type="math/tex">O(n^2)</script></span></li>
+</ul>
+<h3>Monotone polygons</h3>
+<p>We can see that Graham scan actually triangulates a polygon that can be seen from the bottom. This polygon can be called a half monotone polygon and the algorithm runs in <span class="math"><script type="math/tex">O(n)</script></span>.</p>
+<p><strong>Definition</strong>: Monotone polygon is a polygon such that any vertical line intersects it in one piece.</p>
+<p>We have then an algorithm for full monotone polygons:</p>
+<ul>
+<li><strong>First</strong>: We have a deque where the points at the bottom are inserted to the left and the points at the top are inserted in the right (red and blue vertices).</li>
+<li><strong>Second</strong> Perform modified Graham Scan on that. Go from right to the left in the deque and perform left turn.
+<ul>
+<li>If we find a right turn, we add next vertex in the polygon and iterate.</li>
+</ul>
+</li>
+</ul>
+<p>This algorithm takes <span class="math"><script type="math/tex">O(n)</script></span> time!</p>
+<h3>Converting regular to Monotone</h3>
+<p>We will use a sweepline to do this with a set of events: start, end, split, join, regular vertices
+(see events in book page 50 in book).</p>
+<p>See book pages 50-55 for this section.</p>
+<h1>Assignment</h1>
+<p>Implement a triangulation algorithm (the slowest or fastest one).</p>
   </body>
 </html>
